@@ -6,23 +6,33 @@
 
 #include "prod.h"
 
+typedef struct {
+    int *a;
+    int i, j;
+    int p;
+} Args;
+
+void *thread_function(void *n){
+    Args *arg = (Args*) n;
+    parArrayProd(arg->a, arg->i, arg->j, arg->p);
+    return NULL;
+}
+
+
 BigNum *parArrayProd(int a[], int i, int j, int p) {
-    BigNum *result = NULL;
-    if (i < j) {
-        if (p == 1) {
-            result = arrayProd(a, i, j);
-        } else {
-            int h = (i + j) / 2;
+    if (i < j){
+        if (p == 1){
+            seqArrayProd(a, i, j);
+        }
+        else{
+            int h = (i + j)/2;
             pthread_t pid;
-            Args args = {a, i, h, p / 2};
+            Args args = {a, i, h-1, p/2};
             pthread_create(&pid, NULL, thread_function, &args);
-            BigNum *result2 = parArrayProd(a, h, j, p - (p / 2));
+            parArrayProd(a, h+1, j, p - (p/2));
             pthread_join(pid, NULL);
-            result = bigNumProd(result2, args.result);
-            freeBigNum(result2);
         }
     }
-    return result;
   // Programe aca una version paralela del producto de los enteros
   // de un arreglo desde los indices i al j, usando p threads
 
