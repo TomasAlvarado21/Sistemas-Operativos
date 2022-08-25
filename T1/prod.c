@@ -10,12 +10,12 @@ typedef struct {
     int *a;
     int i, j;
     int p;
-    int res;
+    BigNum *res;
 } Args;
 
 void *thread_function(void *n){
     Args *arg = (Args*) n;
-    args -> res = parArrayProd(arg->a, arg->i, arg->j, arg->p);
+    (arg -> res) = parArrayProd(arg->a, arg->i, arg->j, arg->p);
     return NULL;
 }
 
@@ -28,11 +28,21 @@ BigNum *parArrayProd(int a[], int i, int j, int p) {
         else{
             int h = (i + j)/2;
             pthread_t pid;
-            Args args = {a, i, h-1, p/2};
+            Args args = {a, i, h, p/2};
             pthread_create(&pid, NULL, thread_function, &args);
-            parArrayProd(a, h+1, j, p - (p/2));
+            BigNum *der = parArrayProd(a, h+1, j, p - (p/2));
             pthread_join(pid, NULL);
+            BigNum *prod = bigMul((args.res), der);
+            freeBigNum(args.res);
+            freeBigNum(der);
+            return prod;
         }
+    }
+    else if (i == j){
+        return seqArrayProd(a, i, j);
+    }
+    else{
+        exit(1);
     }
   // Programe aca una version paralela del producto de los enteros
   // de un arreglo desde los indices i al j, usando p threads
@@ -52,7 +62,7 @@ BigNum *parArrayProd(int a[], int i, int j, int p) {
   // finalmente el producto de los resultados calculados por ambos threads.
 
   // Esto compila y pasa make run-san, pero no pasa run-O ni run-g
-  return args -> res;
+  return seqArrayProd(a, i, j);
 }
 
 // El valor del producto puede exceder el limite de representacion
