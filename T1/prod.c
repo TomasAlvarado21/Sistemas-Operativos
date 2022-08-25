@@ -10,11 +10,12 @@ typedef struct {
     int *a;
     int i, j;
     int p;
+    int res;
 } Args;
 
 void *thread_function(void *n){
     Args *arg = (Args*) n;
-    parArrayProd(arg->a, arg->i, arg->j, arg->p);
+    args -> res = parArrayProd(arg->a, arg->i, arg->j, arg->p);
     return NULL;
 }
 
@@ -51,7 +52,7 @@ BigNum *parArrayProd(int a[], int i, int j, int p) {
   // finalmente el producto de los resultados calculados por ambos threads.
 
   // Esto compila y pasa make run-san, pero no pasa run-O ni run-g
-  return seqArrayProd(a, i, j);
+  return args -> res;
 }
 
 // El valor del producto puede exceder el limite de representacion
