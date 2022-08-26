@@ -23,7 +23,8 @@ void *thread_function(void *n){
 BigNum *parArrayProd(int a[], int i, int j, int p) {
     if (i < j){
         if (p == 1){
-            seqArrayProd(a, i, j);
+            return seqArrayProd(a, i, j);
+            
         }
         else{
             int h = (i + j)/2;
