@@ -21,15 +21,15 @@ Test: speed up
 Intento: 1
 Calculando factorial de 10000 secuencialmente
 En mi computador Ryzen 3550H se demoro unos 20 segundos
-Tiempo=101 milisegundos, cifras hexadecimales=29615
+Tiempo=98 milisegundos, cifras hexadecimales=29615
 Calculando en paralelo con 4 threads
 Deberia demorarse menos que la version secuencial
 En mi computador el speed up rondaba 1.4 con 2 cores
-Llamada secuencial con i=7500 j=9999
 Llamada secuencial con i=2500 j=4999
 Llamada secuencial con i=0 j=2499
+Llamada secuencial con i=7500 j=9999
 Llamada secuencial con i=5000 j=7499
-Tiempo=45 milisegundos, speed up=2.244444
+Tiempo=52 milisegundos, speed up=1.884615
 Felicitaciones: aprobo este modo de ejecucion
 ==== run-g ====
 gcc -g -Wall -Werror -std=c18  prod.c test-prod.c BigInt.c prod.h BigInt.h -lm -lpthread -o prod.bin-g
@@ -52,7 +52,7 @@ Test: speed up
 Intento: 1
 Calculando factorial de 40000 secuencialmente
 En mi computador Ryzen 3550H se demoro unos 20 segundos
-Tiempo=412 milisegundos, cifras hexadecimales=138453
+Tiempo=425 milisegundos, cifras hexadecimales=138453
 Calculando en paralelo con 4 threads
 Deberia demorarse menos que la version secuencial
 En mi computador el speed up rondaba 1.4 con 2 cores
@@ -60,7 +60,7 @@ Llamada secuencial con i=30000 j=39999
 Llamada secuencial con i=20000 j=29999
 Llamada secuencial con i=10000 j=19999
 Llamada secuencial con i=0 j=9999
-Tiempo=245 milisegundos, speed up=1.681633
+Tiempo=234 milisegundos, speed up=1.816239
 Felicitaciones: aprobo este modo de ejecucion
 Verificando que se crearon 4 procesos pesados
 1c1
