@@ -1,0 +1,7 @@
+Sistema operativo utilizado
+Linux DESKTOP-6L9EJ9T 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 GNU/Linux
+==== run-san =============================
+Test con pthreads usando spin-locks que esperan con busy-waiting
+gcc -g -fsanitize=address -fsanitize=undefined -DSAN -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s  -lm -lpthread -o disk.pbin-san
+Ejecute con: disk.pbin-san
+./disk.pbin-san
