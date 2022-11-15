@@ -60,6 +60,7 @@ void requestDisk(int track) {
     }
     spinUnlock(&sl); // hacemos spinUnlock para poder hacer lock a w
     spinLock(&req->w); // dejamos el w en espera de su turno
+    free(req); // aqui hacemos el free de la estructura request
     return;
   }
 }
@@ -77,15 +78,15 @@ void releaseDisk() {
     }
 
     Request *get = priGet(higher_track); // sacamos el primero de higher
-    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
     last_track = get->t; // actualizamos el ultimo track global
+    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
     
-    //free(get); // liberamos el espacio de memoria de get pero aun asi esto no es suficiente para que pase el test
+    //free(get); // liberamos el espacio de memoria de get pero aun asi esto no es suficiente para que pase el test (ya no es necesaria esta parte porque fue solucionado en el requestDisk)
   }else{
     Request *get = priGet(higher_track); // sacamos el primero de higher
-    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
     last_track = get->t; // actualizamos el ultimo track global
-    //free(get); // si bien al hacer ambos free(get) baja el memory leak, no es suficiente para que pase el test
+    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
+    //free(get); // si bien al hacer ambos free(get) baja el memory leak, no es suficiente para que pase el test (ya no es necesaria esta parte porque fue solucionado en el requestDisk)
 
   }
   spinUnlock(&sl);
