@@ -7,7 +7,7 @@
 // a su antojo.
 
 //... defina aca sus variables globales con el atributo static ...
-static int nAcc; // numero de threads accediendo al recurso compartido
+static int n_threads; // numero de threads accediendo al recurso compartido
 static NthQueue *q; // cola de threads esperando para acceder al recurso compartido
 static nThread gTh; // puntero al thread que tiene el recurso compartido
 
@@ -17,6 +17,7 @@ static nThread gTh; // puntero al thread que tiene el recurso compartido
 static void f(nThread th) {
   if (nth_queryThread(q, th)){
     nth_delQueue(q, th);
+    n_threads--;
   }
   return;
   // programe aca la funcion que usa nth_queryThread para consultar si
@@ -29,7 +30,7 @@ static void f(nThread th) {
 void nth_compartirInit(void) {
   START_CRITICAL
   q = nth_makeQueue();
-  nAcc = 0;
+  n_threads = 0;
   END_CRITICAL
 }
 
@@ -59,9 +60,9 @@ void nCompartir(void *ptr) {
   END_CRITICAL
 }
 
-void *nAcceder(int max_millis) {
+void *n_threadseder(int max_millis) {
   START_CRITICAL
-  nAcc++;
+  n_threads++;
   nThread thisTh= nSelf();
 
   long long nanosegs = (long long) max_millis * 1000000;
@@ -77,16 +78,22 @@ void *nAcceder(int max_millis) {
     }
       schedule();
   }
-  void * ptr = gTh->ptr;
+  void *ptr;
+  if (gTh == NULL){
+    ptr = NULL;
+  }
+  else{
+    ptr = gTh->ptr;
+  }
   END_CRITICAL
   return ptr;
 }
 
 void nDevolver(void) {
   START_CRITICAL
-  nAcc--;
+  n_threads--;
   nThread thisTh= nSelf();
-  if(gTh != NULL && gTh->status == WAIT_ACCEDER && nAcc == 0){
+  if(gTh != NULL && gTh->status == WAIT_ACCEDER && n_threads == 0){
     setReady(gTh);
     schedule();
   }
