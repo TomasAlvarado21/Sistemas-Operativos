@@ -49,15 +49,17 @@ void requestDisk(int track) {
   }else{
     // inicializamos un spinlock cerrado para este track, dejandolo en espera
     int w = CLOSED;
-    Request req = {track, w};
+    Request *req = malloc(sizeof(Request));
+    req->t = track;
+    req->w = w;
     // como el disco esta ocupado, tenemos que dejar este track en espera ademas de colocarlo en la cola de prioridad 
     if (track >= last_track){ // vemos si el track es mayor o igual al ultimo track, si es asi lo colocamos en el PriQueue higher sino en el lower
-      priPut(higher_track, &req, track);
+      priPut(higher_track, req, track);
     }else{
-      priPut(lower_track, &req, track);
+      priPut(lower_track, req, track);
     }
     spinUnlock(&sl); // hacemos spinUnlock para poder hacer lock a w
-    spinLock(&w); // dejamos el w en espera de su turno
+    spinLock(&req->w); // dejamos el w en espera de su turno
     return;
   }
 }
@@ -67,18 +69,25 @@ void releaseDisk() {
 
   if (emptyPriQueue(higher_track) && emptyPriQueue(lower_track)){
     last_track = -1;
-  }else if(!emptyPriQueue(higher_track)){
-    Request *puntero = priGet(higher_track);
-    spinUnlock(&(puntero->w));
-  }else{
+  }else if(emptyPriQueue(higher_track) && !emptyPriQueue(lower_track)){
 
-    while (!emptyPriQueue(lower_track)){
-      Request *get = priGet(lower_track);
-      priPut(higher_track, &(get->w), get->t);
+    while (!emptyPriQueue(lower_track)){ // sacamos todos los tracks de la cola lower y los colocamos en la cola higher
+      Request *req = priGet(lower_track);
+      priPut(higher_track, req, req->t);
     }
+
+    Request *get = priGet(higher_track); // sacamos el primero de higher
+    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
+    last_track = get->t; // actualizamos el ultimo track global
     
-    Request *puntero = priGet(higher_track);
-    spinUnlock(&(puntero->w));
+    //free(get); // liberamos el espacio de memoria de get pero aun asi esto no es suficiente para que pase el test
+  }else{
+    Request *get = priGet(higher_track); // sacamos el primero de higher
+    spinUnlock(&get->w); // le hacemos un unlock al w de ese track
+    last_track = get->t; // actualizamos el ultimo track global
+    //free(get); // si bien al hacer ambos free(get) baja el memory leak, no es suficiente para que pase el test
+
   }
   spinUnlock(&sl);
 }
+
